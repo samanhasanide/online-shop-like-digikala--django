@@ -1,0 +1,442 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+
+<style>
+    .cart-section {
+        padding: 60px 0;
+        min-height: 500px;
+    }
+
+    .cart-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 35px;
+    }
+
+    .cart-table {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .cart-table th {
+        background-color: #f8f9fa;
+        padding: 18px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .cart-table td {
+        padding: 20px;
+        vertical-align: middle;
+    }
+
+    .cart-product-image {
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 5px;
+    }
+
+    .cart-product-name {
+        font-size: 17px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #212529;
+    }
+
+    .cart-product-name:hover {
+        color: #6c757d;
+    }
+
+
+    /* =========================
+       Quantity
+    ========================= */
+
+    .quantity-input {
+        width: 75px;
+        height: 42px;
+        text-align: center;
+        margin: auto;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 5px;
+    }
+
+    /* همیشه فلش‌های input number نمایش داده شوند */
+    .quantity-input::-webkit-inner-spin-button,
+    .quantity-input::-webkit-outer-spin-button {
+        opacity: 1;
+        visibility: visible;
+        display: block;
+    }
+
+    /* Firefox */
+    .quantity-input {
+        -moz-appearance: number-input;
+        appearance: auto;
+    }
+
+
+    .cart-summary {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 25px;
+        background-color: #fff;
+    }
+
+    .summary-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .summary-total {
+        font-size: 22px;
+        font-weight: bold;
+        border-top: 1px solid #dee2e6;
+        padding-top: 20px;
+        margin-top: 20px;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        padding: 13px;
+        font-size: 17px;
+    }
+
+    .continue-shopping {
+        text-decoration: none;
+        color: #212529;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 70px 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    .empty-cart i {
+        font-size: 65px;
+        color: #adb5bd;
+        margin-bottom: 20px;
+    }
+
+
+    @media (max-width: 768px) {
+
+        .cart-section {
+            padding: 30px 0;
+        }
+
+        .cart-title {
+            font-size: 26px;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            padding: 12px;
+        }
+
+        .cart-product-image {
+            width: 65px;
+            height: 65px;
+        }
+
+        .quantity-input {
+            width: 70px;
+        }
+    }
+
+</style>
+
+
+<section class="cart-section">
+
+    <div class="container">
+
+        <h1 class="cart-title">
+
+            <i class="bi bi-cart3"></i>
+
+            Shopping Cart
+
+        </h1>
+
+
+        {% if cart_products %}
+
+        <div class="row g-4">
+
+
+            <!-- محصولات سبد خرید -->
+
+            <div class="col-lg-8">
+
+                <div class="table-responsive cart-table">
+
+                    <table class="table mb-0 text-center">
+
+                        <thead>
+
+                            <tr>
+
+                                <th colspan="2" class="text-start">
+                                    Product
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Quantity
+                                </th>
+
+                                <th>
+                                    Subtotal
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for item in cart_items %}
+
+                            <tr>
+
+
+                                <!-- تصویر محصول -->
+
+                                <td style="width: 100px;">
+
+
+                                <img
+                                    src="{{ item.product.picture.url }}"
+                                    alt="{{ item.product.name }}"
+                                    class="cart-product-image"
+                                >
+
+                                </td>
+
+
+                                <!-- نام و دسته بندی -->
+
+                                <td class="text-start">
+
+                                    <a
+                                        href="#"
+                                        class="cart-product-name"
+                                    >
+
+                                        {{ item.product.name }}
+
+                                    </a>
+
+
+                                    <div class="text-muted small mt-2">
+
+                                        {{ item.product.category }}
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- قیمت -->
+
+                                <td>
+
+                                    {{ item.product.price }} $
+
+                                </td>
+
+
+                                <!-- تعداد -->
+
+                               <td>
+
+                                    <form method="POST" action="{% url 'cart_update' %}">
+
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="product_id"
+                                            value="{{ item.product.id }}"
+                                        >
+
+                                        <input
+                                            type="number"
+                                            class="form-control quantity-input"
+                                            name="quantity"
+                                            value="{{ item.quantity }}"
+                                            min="1"
+                                            step="1"
+                                            onchange="this.form.submit()"
+                                        >
+
+                                    </form>
+
+                                </td>
+
+
+                                <!-- قیمت کل -->
+
+                                <td class="fw-bold">
+
+                                    {{ item.subtotal }} $
+
+                                </td>
+
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- ادامه خرید -->
+
+                <div class="mt-4">
+
+                    <a
+                        href="/"
+                        class="continue-shopping"
+                    >
+
+                        <i class="bi bi-arrow-left"></i>
+
+                        Continue Shopping
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- خلاصه سفارش -->
+
+            <div class="col-lg-4">
+
+                <div class="cart-summary">
+
+                    <h4 class="summary-title">
+                        Order Summary
+                    </h4>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Products
+                        </span>
+
+                        <span>
+                            {{ cart_quantity }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Shipping
+                        </span>
+
+                        <span>
+                            Calculated at checkout
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row summary-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <span>
+                            {{ cart_total }} $
+                        </span>
+
+                    </div>
+
+
+                    <a
+                        href="#"
+                        class="btn btn-dark checkout-btn mt-3"
+                    >
+
+                        Proceed to Checkout
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- سبد خرید خالی -->
+
+        <div class="empty-cart">
+
+            <i class="bi bi-cart-x"></i>
+
+            <h3>
+                Your cart is empty!
+            </h3>
+
+            <p class="text-muted mt-3">
+
+                You haven't added any products to your cart yet.
+
+            </p>
+
+            <a
+                href="/"
+                class="btn btn-dark mt-3"
+            >
+
+                Start Shopping
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

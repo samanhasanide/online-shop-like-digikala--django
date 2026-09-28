@@ -1,0 +1,30 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+
+<header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">Login in style</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>
+                </div>
+            </div>
+        </header>
+<br><br>
+<div class="container">
+    <div class="row">
+        <center>
+            <div class="col-10">
+                <h1 class='text-center'>login form</h1>
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    {{form}}
+                    <button type="submit" class="btn btn_primary">LOGIN</button>
+                </form>
+            </div>
+        </center>
+    </div>
+</div>
+<br><br>
+
+
+{% endblock content %}
