@@ -133,6 +133,21 @@
         margin-bottom: 20px;
     }
 
+    .delete-cart-btn {
+        display: inline-block;
+        background-color: #dc3545;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .delete-cart-btn:hover {
+        background-color: #bb2d3b;
+        color: white;
+    }
+
 
     @media (max-width: 768px) {
 
@@ -189,27 +204,13 @@
                     <table class="table mb-0 text-center">
 
                         <thead>
-
                             <tr>
-
-                                <th colspan="2" class="text-start">
-                                    Product
-                                </th>
-
-                                <th>
-                                    Price
-                                </th>
-
-                                <th>
-                                    Quantity
-                                </th>
-
-                                <th>
-                                    Subtotal
-                                </th>
-
+                                <th>Product</th>
+                                <th>Action</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
                             </tr>
-
                         </thead>
 
 
@@ -219,46 +220,51 @@
 
                             <tr>
 
+                                <!-- تصویر + نام محصول -->
+                                <td>
 
-                                <!-- تصویر محصول -->
+                                    <div class="d-flex align-items-center">
 
-                                <td style="width: 100px;">
+                                        <img
+                                            src="{{ item.product.picture.url }}"
+                                            alt="{{ item.product.name }}"
+                                            class="cart-product-image me-4"
+                                        >
 
+                                        <div class="text-start">
 
-                                <img
-                                    src="{{ item.product.picture.url }}"
-                                    alt="{{ item.product.name }}"
-                                    class="cart-product-image"
-                                >
+                                            <a
+                                                href="#"
+                                                class="cart-product-name"
+                                            >
+                                                {{ item.product.name }}
+                                            </a>
 
-                                </td>
+                                            <div class="text-muted small mt-2">
+                                                {{ item.product.category }}
+                                            </div>
 
-
-                                <!-- نام و دسته بندی -->
-
-                                <td class="text-start">
-
-                                    <a
-                                        href="#"
-                                        class="cart-product-name"
-                                    >
-
-                                        {{ item.product.name }}
-
-                                    </a>
-
-
-                                    <div class="text-muted small mt-2">
-
-                                        {{ item.product.category }}
+                                        </div>
 
                                     </div>
 
                                 </td>
 
 
-                                <!-- قیمت -->
+                                <!-- حذف محصول -->
+                                <td>
 
+                                    <a
+                                        href="{% url 'cart_delete' item.product.id %}"
+                                        class="btn btn-danger"
+                                    >
+                                        Remove
+                                    </a>
+
+                                </td>
+
+
+                                <!-- قیمت -->
                                 <td>
 
                                     {{ item.product.price }} $
@@ -267,8 +273,7 @@
 
 
                                 <!-- تعداد -->
-
-                               <td>
+                                <td>
 
                                     <form method="POST" action="{% url 'cart_update' %}">
 
@@ -296,13 +301,11 @@
 
 
                                 <!-- قیمت کل -->
-
                                 <td class="fw-bold">
 
                                     {{ item.subtotal }} $
 
                                 </td>
-
 
                             </tr>
 

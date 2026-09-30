@@ -35,7 +35,10 @@
                                         {% endwith %}
                                     </div>
                                     <!-- Product price-->
-                                    category:{{product.category}} <br>
+                                    category:<a href="{% url 'category_page' product.category %}">
+                                         {{ product.category }}
+                                    </a>
+                                    <br>
                                     {% if product.is_sale %}
                                     <del>{{product.price}} dollor</del>
                                     <br>

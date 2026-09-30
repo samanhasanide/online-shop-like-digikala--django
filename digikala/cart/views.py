@@ -100,8 +100,10 @@ def cart_add(request):
     })
 
 
-def cart_delete(request):
-    pass
+def cart_delete(request, product_id):
+    cart = CartBasket(request)
+    cart.delete(product=product_id)
+    return redirect('cart_summary')
 
 
 def cart_update(request):

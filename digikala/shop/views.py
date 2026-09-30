@@ -18,6 +18,11 @@ def category_page(request, cat):
     try:
         category = models.Category.objects.get(name=cat)
         products = models.Product.objects.filter(category=category)
-        return render(request, 'shop/index.html', {'product': products}, {"category": category})
+        return render(request, 'shop/index.html', {'products': products, "category": category})
     except:
         return redirect('home')
+
+
+def category_summary(request):
+    all_categories = models.Category.objects.all()
+    return render(request, 'shop/category_summary.html', {'categories': all_categories})
