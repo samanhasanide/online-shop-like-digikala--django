@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import registerforms, Loginform
 from django.urls import reverse
-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
 
@@ -38,4 +38,31 @@ def login_user(request):
 
 
 def logout_user(request):
+
     pass
+
+
+@login_required
+def profile(request):
+
+    if request.method == 'POST':
+
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+
+        if field == 'first_name':
+            request.user.first_name = value
+
+        elif field == 'last_name':
+            request.user.last_name = value
+
+        elif field == 'email':
+            request.user.email = value
+
+        request.user.save()
+
+        return redirect('profile')
+
+    return render(request, 'accounts/profile.html', {
+        'user': request.user
+    })
