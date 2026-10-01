@@ -1,6 +1,10 @@
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField, PasswordChangeForm
 from django.contrib.auth.models import User
 from django import forms
+
+
+class UpdatePasswordForm(PasswordChangeForm):
+    pass
 
 
 class registerforms(UserCreationForm):

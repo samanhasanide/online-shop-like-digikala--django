@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-
-# Create your views here.
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import registerforms, Loginform
+from .forms import registerforms, Loginform, UpdatePasswordForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -66,3 +65,22 @@ def profile(request):
     return render(request, 'accounts/profile.html', {
         'user': request.user
     })
+
+
+@login_required
+def update_password(request):
+
+    if request.method == 'POST':
+        form = UpdatePasswordForm(request.user, request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            update_session_auth_hash(request, user)
+
+            return redirect('profile')
+
+    else:
+        form = UpdatePasswordForm(request.user)
+
+    return render(request, 'accounts/update_password.html', {'form': form})
