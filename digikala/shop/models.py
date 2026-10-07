@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-import datetime
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -13,14 +14,31 @@ class Category(models.Model):
 
 
 class Customer(models.Model):
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
     phone = models.CharField(max_length=20)
-    email = models.EmailField
-    password = models.CharField(max_length=20)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.user.first_name} {self.user.last_name}'
+
+
+class Address(models.Model):
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.CASCADE,
+        related_name='addresses'
+    )
+
+    title = models.CharField(max_length=30)
+    address = models.TextField(max_length=400)
+
+    def __str__(self):
+        return f'{self.customer} - {self.title}'
 
 
 class Product(models.Model):
@@ -52,11 +70,13 @@ class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    address = models.CharField(
-        max_length=500, default='', blank=False)
+    address = models.ForeignKey(
+        Address,
+        on_delete=models.PROTECT
+    )
     phone = models.CharField(max_length=20, blank=True)
-    date = models.DateField(default=datetime.datetime.today())
+    date = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.product
+        return f'{self.customer} - {self.product}'

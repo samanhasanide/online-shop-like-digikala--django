@@ -6,6 +6,7 @@ from .forms import registerforms, Loginform, UpdatePasswordForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from shop.models import Customer
 
 
 def register(request):
@@ -14,18 +15,34 @@ def register(request):
     else:
         if request.method == 'POST':
             form = registerforms(request.POST)
+
             if form.is_valid():
-                form.save()
+
+                user = form.save()
+
+                Customer.objects.create(
+                    user=user,
+                    phone=''
+                )
+
                 username = form.cleaned_data['username']
                 password1 = form.cleaned_data['password1']
+
                 user = authenticate(
-                    request, username=username, password=password1)
+                    request,
+                    username=username,
+                    password=password1
+                )
+
                 login(request, user)
+
                 homeurl = reverse('home')
                 return HttpResponseRedirect(homeurl)
+
             else:
                 registerurl = reverse('register')
                 return HttpResponseRedirect(registerurl)
+
         else:
             form = registerforms()
 
