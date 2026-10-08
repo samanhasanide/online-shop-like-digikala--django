@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from .forms import registerforms, Loginform, UpdatePasswordForm
+from .forms import registerforms, Loginform, UpdatePasswordForm, AddressForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from shop.models import Customer
+from shop.models import Customer, Address
 
 
 def register(request):
@@ -61,26 +61,73 @@ def logout_user(request):
 @login_required
 def profile(request):
 
+    customer = Customer.objects.get(user=request.user)
+
     if request.method == 'POST':
 
-        field = request.POST.get('field')
-        value = request.POST.get('value')
+        action = request.POST.get('action')
+        # Add Address
 
-        if field == 'first_name':
-            request.user.first_name = value
+        if action == 'add_address':
 
-        elif field == 'last_name':
-            request.user.last_name = value
+            if customer.addresses.count() >= 2:
+                return redirect('profile')
 
-        elif field == 'email':
-            request.user.email = value
+            form = AddressForm(request.POST)
 
-        request.user.save()
+            if form.is_valid():
+                address = form.save(commit=False)
+                address.customer = customer
+                address.save()
 
-        return redirect('profile')
+                return redirect('profile')
+
+        # Edit Address
+
+        elif action == 'edit_address':
+
+            address_id = request.POST.get('address_id')
+
+            address = customer.addresses.get(id=address_id)
+
+            form = AddressForm(
+                request.POST,
+                instance=address
+            )
+
+            if form.is_valid():
+                form.save()
+
+            return redirect('profile')
+
+        # =========================
+        # Edit User Information
+        # =========================
+        else:
+
+            field = request.POST.get('field')
+            value = request.POST.get('value')
+
+            if field == 'first_name':
+                request.user.first_name = value
+
+            elif field == 'last_name':
+                request.user.last_name = value
+
+            elif field == 'email':
+                request.user.email = value
+
+            request.user.save()
+
+            return redirect('profile')
+
+    addresses = customer.addresses.all()
 
     return render(request, 'accounts/profile.html', {
-        'user': request.user
+        'user': request.user,
+        'customer': customer,
+        'addresses': addresses,
+        'address_form': AddressForm(),
     })
 
 

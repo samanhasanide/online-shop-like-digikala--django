@@ -196,7 +196,196 @@
 
                     </div>
 
+                    <!-- ========================= -->
+                    <!-- Addresses -->
+                    <!-- ========================= -->
 
+                    <div class="border-top pt-4 mt-4">
+
+                        <h4 class="mb-4">My Addresses</h4>
+
+
+                        <!-- Existing Addresses -->
+                        {% for address in addresses %}
+
+                            <div class="card mb-3 border">
+
+                                <div class="card-body">
+
+                                    <div class="d-flex justify-content-between align-items-center">
+
+                                        <h5 class="mb-0">
+                                            {{ address.title }}
+                                        </h5>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-primary btn-sm edit-address-btn">
+
+                                            Edit
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <!-- Address text -->
+                                    <div class="address-view mt-3">
+
+                                        <p class="text-muted mb-0">
+                                            {{ address.address }}
+                                        </p>
+
+                                    </div>
+
+
+                                    <!-- Edit form -->
+                                    <div class="address-edit-form mt-3" style="display: none;">
+
+                                        <form method="POST">
+
+                                            {% csrf_token %}
+
+                                            <input
+                                                type="hidden"
+                                                name="action"
+                                                value="edit_address"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="address_id"
+                                                value="{{ address.id }}"
+                                            >
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Address Name
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    name="title"
+                                                    class="form-control"
+                                                    value="{{ address.title }}"
+                                                    required
+                                                >
+
+                                            </div>
+
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Address
+                                                </label>
+
+                                                <textarea
+                                                    name="address"
+                                                    class="form-control"
+                                                    rows="3"
+                                                    required
+                                                >{{ address.address }}</textarea>
+
+                                            </div>
+
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success">
+
+                                                Save
+
+                                            </button>
+
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary cancel-edit-btn">
+
+                                                Cancel
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <p class="text-muted">
+                                You don't have any saved addresses.
+                            </p>
+
+                        {% endfor %}
+
+
+                        <!-- ========================= -->
+                        <!-- Add New Address -->
+                        <!-- ========================= -->
+
+                        {% if addresses|length < 2 %}
+
+                            <div class="mt-4">
+
+                                <h5 class="mb-3">
+                                    Add New Address
+                                </h5>
+
+                                <form method="POST">
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="add_address"
+                                    >
+
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Address Name
+                                        </label>
+
+                                        {{ address_form.title }}
+
+                                    </div>
+
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Address
+                                        </label>
+
+                                        {{ address_form.address }}
+
+                                    </div>
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary">
+
+                                        Add Address
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
                     <!-- ========================= -->
                     <!-- Change Password -->
                     <!-- ========================= -->
@@ -225,32 +414,79 @@
 
 <script>
 
+    /* =========================
+       Edit Profile Information
+       ========================= */
+
     document.querySelectorAll('.edit-btn').forEach(function(button) {
 
         button.addEventListener('click', function() {
 
-            // Find the form related to this button
             let form = button.closest('form');
 
-            // Find the input inside this form
             let input = form.querySelector('input[name="value"]');
 
-            // Find the save button inside this form
             let saveButton = form.querySelector('.save-btn');
 
-
-            // Enable the input
             input.disabled = false;
 
-            // Focus on the input
             input.focus();
 
-
-            // Hide the Edit button
             button.style.display = 'none';
 
-            // Show the Save button
             saveButton.style.display = 'inline-block';
+
+        });
+
+    });
+
+
+    /* =========================
+       Edit Address
+       ========================= */
+
+    document.querySelectorAll('.edit-address-btn').forEach(function(button) {
+
+        button.addEventListener('click', function() {
+
+            let card = button.closest('.card');
+
+            let addressView = card.querySelector('.address-view');
+
+            let editForm = card.querySelector('.address-edit-form');
+
+            addressView.style.display = 'none';
+
+            editForm.style.display = 'block';
+
+            button.style.display = 'none';
+
+        });
+
+    });
+
+
+    /* =========================
+       Cancel Address Edit
+       ========================= */
+
+    document.querySelectorAll('.cancel-edit-btn').forEach(function(button) {
+
+        button.addEventListener('click', function() {
+
+            let card = button.closest('.card');
+
+            let addressView = card.querySelector('.address-view');
+
+            let editForm = card.querySelector('.address-edit-form');
+
+            let editButton = card.querySelector('.edit-address-btn');
+
+            addressView.style.display = 'block';
+
+            editForm.style.display = 'none';
+
+            editButton.style.display = 'inline-block';
 
         });
 
