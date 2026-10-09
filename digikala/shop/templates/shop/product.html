@@ -3,10 +3,19 @@
 {% block content %}
 
 <style>
+
     .product-section {
         padding: 80px 0;
     }
 
+    /* بخش عکس */
+    .product-gallery {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* عکس اصلی */
     .product-image {
         width: 100%;
         max-width: 500px;
@@ -16,6 +25,37 @@
         border-radius: 8px;
         padding: 30px;
         background-color: white;
+    }
+
+    /* بخش عکس‌های کوچک */
+    .product-thumbnails {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    /* عکس کوچک */
+    .product-thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 5px;
+        background-color: white;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .product-thumbnail:hover {
+        border-color: #212529;
+    }
+
+    /* عکس انتخاب شده */
+    .product-thumbnail.active {
+        border-color: #212529;
     }
 
     .product-title {
@@ -90,6 +130,7 @@
         font-size: 30px;
         margin-bottom: 15px;
     }
+
 </style>
 
 
@@ -99,19 +140,56 @@
 
         <div class="row align-items-center">
 
-            <!-- تصویر محصول -->
+            <!-- ========================= -->
+            <!-- تصاویر محصول -->
+            <!-- ========================= -->
+
             <div class="col-md-6 text-center">
 
-                <img
-                    src="{{ product.picture.url }}"
-                    alt="{{ product.name }}"
-                    class="product-image"
-                >
+                <div class="product-gallery">
+
+                    <!-- عکس اصلی -->
+                    <img
+                        src="{{ product.picture.url }}"
+                        alt="{{ product.name }}"
+                        class="product-image"
+                        id="main-product-image"
+                    >
+
+                    <!-- عکس‌های کوچک -->
+                    <div class="product-thumbnails">
+
+                        <!-- عکس اصلی محصول -->
+                        <img
+                            src="{{ product.picture.url }}"
+                            alt="{{ product.name }}"
+                            class="product-thumbnail active"
+                            onclick="changeMainImage(this, '{{ product.picture.url }}')"
+                        >
+
+                        <!-- عکس‌های اضافی -->
+                        {% for image in product.images.all %}
+
+                            <img
+                                src="{{ image.image.url }}"
+                                alt="{{ product.name }}"
+                                class="product-thumbnail"
+                                onclick="changeMainImage(this, '{{ image.image.url }}')"
+                            >
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
 
             </div>
 
 
+            <!-- ========================= -->
             <!-- اطلاعات محصول -->
+            <!-- ========================= -->
+
             <div class="col-md-6">
 
                 <!-- برچسب تخفیف -->
@@ -126,7 +204,9 @@
 
                 <!-- نام محصول -->
                 <h1 class="product-title">
+
                     {{ product.name }}
+
                 </h1>
 
 
@@ -136,9 +216,13 @@
                     {% for i in "12345" %}
 
                         {% if forloop.counter <= product.star %}
+
                             ★
+
                         {% else %}
+
                             ☆
+
                         {% endif %}
 
                     {% endfor %}
@@ -152,7 +236,9 @@
                     category:
 
                     <strong>
+
                         {{ product.category }}
+
                     </strong>
 
                 </div>
@@ -192,11 +278,15 @@
                 <div class="description">
 
                     <h5>
+
                         Product Description
+
                     </h5>
 
                     <p>
+
                         {{ product.description }}
+
                     </p>
 
                 </div>
@@ -222,8 +312,11 @@
                             value="{{ product.id }}"
                             id="add-cart"
                         >
+
                             <i class="bi bi-cart-plus"></i>
+
                             Add to cart
+
                         </button>
 
                     </div>
@@ -241,17 +334,21 @@
 
                 {% endif %}
 
-
             </div>
 
         </div>
 
 
+        <!-- ========================= -->
         <!-- امکانات -->
+        <!-- ========================= -->
+
         <div class="features">
 
             <div class="row g-4">
 
+
+                <!-- ارسال سریع -->
                 <div class="col-md-4">
 
                     <div class="feature-box">
@@ -259,12 +356,16 @@
                         <i class="bi bi-truck"></i>
 
                         <h5>
+
                             Fast Delivery
+
                         </h5>
 
                         <p class="text-muted">
+
                             Fast and safe delivery
                             to your address.
+
                         </p>
 
                     </div>
@@ -272,6 +373,7 @@
                 </div>
 
 
+                <!-- پرداخت امن -->
                 <div class="col-md-4">
 
                     <div class="feature-box">
@@ -279,12 +381,16 @@
                         <i class="bi bi-shield-check"></i>
 
                         <h5>
+
                             Secure Payment
+
                         </h5>
 
                         <p class="text-muted">
+
                             Your payment information
                             is completely secure.
+
                         </p>
 
                     </div>
@@ -292,6 +398,7 @@
                 </div>
 
 
+                <!-- مرجوعی -->
                 <div class="col-md-4">
 
                     <div class="feature-box">
@@ -299,17 +406,22 @@
                         <i class="bi bi-arrow-repeat"></i>
 
                         <h5>
+
                             Easy Return
+
                         </h5>
 
                         <p class="text-muted">
+
                             Easy return process
                             for your purchase.
+
                         </p>
 
                     </div>
 
                 </div>
+
 
             </div>
 
@@ -319,25 +431,67 @@
 
 </section>
 
+
+<!-- ========================= -->
+<!-- JavaScript -->
+<!-- ========================= -->
+
 <script>
+
+    function changeMainImage(element, imageUrl) {
+
+        // تغییر عکس اصلی
+        document.getElementById('main-product-image').src = imageUrl;
+
+
+        // حذف active از تمام thumbnail ها
+        let thumbnails = document.querySelectorAll('.product-thumbnail');
+
+        thumbnails.forEach(function(thumbnail) {
+
+            thumbnail.classList.remove('active');
+
+        });
+
+
+        // اضافه کردن active به عکس انتخاب شده
+        element.classList.add('active');
+
+    }
+
+
+    // =========================
+    // افزودن محصول به سبد خرید
+    // =========================
+
     $(document).on('click', '#add-cart', function(e) {
 
         e.preventDefault();
 
+
         // شناسه محصول
         let product_id = $(this).val();
 
-        // تعداد انتخاب‌شده توسط کاربر
+
+        // تعداد انتخاب شده
         let product_qty = $('#cart_qty').val();
 
-        // اعتبارسنجی تعداد
+
+        // تبدیل به عدد
         product_qty = parseInt(product_qty);
 
+
+        // اعتبارسنجی
         if (isNaN(product_qty) || product_qty < 1) {
+
             alert('Please enter a valid quantity');
+
             return;
+
         }
 
+
+        // ارسال درخواست AJAX
         $.ajax({
 
             type: 'POST',
@@ -345,21 +499,29 @@
             url: "{% url 'cart_add' %}",
 
             data: {
+
                 product_id: product_id,
+
                 product_qty: product_qty,
+
                 csrfmiddlewaretoken: '{{ csrf_token }}',
+
                 action: 'post'
+
             },
+
 
             success: function(json) {
 
-                // آپدیت تعداد کل سبد خرید در هدر
+                // آپدیت تعداد سبد خرید
                 $('#cart_quantity').text(json.qty);
 
-                // نمایش تعداد محصول اضافه شده
+
+                // پیام موفقیت
                 alert('Product added to cart!');
 
             },
+
 
             error: function(xhr, errmsg, err) {
 
@@ -372,6 +534,7 @@
         });
 
     });
+
 </script>
 
 {% endblock %}

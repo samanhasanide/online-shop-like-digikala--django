@@ -100,9 +100,8 @@ def profile(request):
 
             return redirect('profile')
 
-        # =========================
         # Edit User Information
-        # =========================
+
         else:
 
             field = request.POST.get('field')
