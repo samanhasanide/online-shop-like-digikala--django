@@ -80,16 +80,79 @@ class ProductImage(models.Model):
 
 
 class Order(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    PAYMENT_CHOICES = [
+        ('online', 'Online Payment'),
+        ('cod', 'Cash on Delivery'),
+    ]
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.PROTECT,
+        related_name='orders'
+    )
+
     address = models.ForeignKey(
         Address,
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        related_name='orders'
     )
-    phone = models.CharField(max_length=20, blank=True)
-    date = models.DateTimeField(default=timezone.now)
-    status = models.BooleanField(default=False)
+
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_CHOICES,
+        default='online'
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
+    total_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    created_at = models.DateTimeField(
+        default=timezone.now
+    )
 
     def __str__(self):
-        return f'{self.customer} - {self.product}'
+        return f"Order #{self.id}"
+
+
+class OrderItem(models.Model):
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='items'
+    )
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.PROTECT
+    )
+
+    quantity = models.PositiveIntegerField(default=1)
+
+    price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0
+    )
+
+    def __str__(self):
+        return f"{self.product} - {self.quantity}"
